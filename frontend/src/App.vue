@@ -1,125 +1,198 @@
 <template>
-  <div id="app">
-    <div class="input-container">
-      <select v-model="speciesName">
+  <div class="container">
+    <div class="controls">
+      <select
+        v-model="selectedSpecies"
+        class="species-select"
+        :disabled="!speciesList.length"
+      >
+        <option value="" disabled>Select Species</option>
         <option v-for="species in speciesList" :key="species" :value="species">
           {{ species }}
         </option>
       </select>
-      <button @click="fetchLocationData">Get Locations</button>
+      <button
+        @click="loadLocationData"
+        :disabled="!selectedSpecies"
+        class="load-button"
+      >
+        Show Locations
+      </button>
     </div>
-    <div class="map-container" ref="map"></div>
+    <div ref="mapContainer" class="map" />
   </div>
 </template>
 
 <script>
 import L from "leaflet";
+import "leaflet.markercluster";
+import "leaflet.heat";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
 export default {
-  name: "App",
+  name: "SpeciesMap",
   data() {
     return {
-      speciesName: "Select Species",
+      selectedSpecies: "",
       speciesList: [],
       map: null,
+      markerCluster: null,
+      heatLayer: null,
+      mapConfig: {
+        center: [19.1433, 72.879], // Mumbai coordinates
+        zoom: 11,
+        tileLayer: {
+          url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          options: {
+            maxZoom: 19,
+            attribution: "© OpenStreetMap",
+          },
+        },
+      },
     };
   },
-  mounted() {
-    this.fetchSpeciesList(); // Fetch species list on mount
-    this.initializeMap([[19.076, 72.8777]]); // Center the map to Mumbai by default
+  async mounted() {
+    try {
+      await this.initializeMap();
+      await this.loadSpeciesList();
+    } catch (error) {
+      console.error("Failed to initialize map:", error);
+    }
   },
   methods: {
-    fetchSpeciesList() {
-      fetch(`http://localhost:8000/speciesList`)
-        .then((response) => response.json())
-        .then((data) => {
-          this.speciesList = data; // Set species list
-        })
-        .catch((error) => console.error("Error fetching species list:", error));
-    },
-    fetchLocationData() {
-      console.log(this.speciesName);
-      if (!this.speciesName) return;
+    initializeMap() {
+      if (this.map) return;
 
-      fetch(`http://localhost:8000/locationData/${this.speciesName}`)
-        .then((response) => response.json())
-        .then((data) => {
-          this.initializeMap(data);
-        })
-        .catch((error) =>
-          console.error("Error fetching location data:", error)
-        );
+      this.map = L.map(this.$refs.mapContainer).setView(
+        this.mapConfig.center,
+        this.mapConfig.zoom
+      );
+
+      L.tileLayer(
+        this.mapConfig.tileLayer.url,
+        this.mapConfig.tileLayer.options
+      ).addTo(this.map);
+
+      this.markerCluster = L.markerClusterGroup();
+      this.markerCluster = L.markerClusterGroup({
+        maxClusterRadius: 50,
+        disableClusteringAtZoom: null, // Changed from 14 to null to always cluster
+        spiderfyOnMaxZoom: false,
+        zoomToBoundsOnClick: true,
+        chunkedLoading: true,
+        animate: false,
+      });
+      this.map.addLayer(this.markerCluster);
     },
-    initializeMap(locations) {
-      if (!this.map) {
-        this.map = L.map(this.$refs.map).setView([19.1433, 72.879], 11); // Center on Mumbai
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-          attribution: "© OpenStreetMap",
-        }).addTo(this.map);
+    async loadSpeciesList() {
+      try {
+        const response = await fetch("http://localhost:8000/speciesList");
+        if (!response.ok) throw new Error("Failed to fetch species list");
+
+        this.speciesList = await response.json();
+        if (this.speciesList.length) {
+          this.selectedSpecies = this.speciesList[0];
+          await this.loadLocationData();
+        }
+      } catch (error) {
+        console.error("Error loading species list:", error);
+        this.speciesList = [];
+      }
+    },
+    async loadLocationData() {
+      if (!this.selectedSpecies) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost:8000/locationData/${this.selectedSpecies}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch location data");
+
+        const locations = await response.json();
+        this.updateMap(locations);
+      } catch (error) {
+        console.error("Error loading location data:", error);
+      }
+    },
+    updateMap(locations) {
+      // Clear existing layers
+      this.markerCluster.clearLayers();
+      if (this.heatLayer) {
+        this.map.removeLayer(this.heatLayer);
       }
 
-      // Clear previous markers
-      this.map.eachLayer((layer) => {
-        if (layer instanceof L.Marker) {
-          this.map.removeLayer(layer);
-        }
+      const heatData = [];
+
+      // Add new markers and heat data
+      locations.forEach(({ lat, lng }) => {
+        this.markerCluster.addLayer(L.marker([lat, lng]));
+        heatData.push([lat, lng]);
       });
 
-      // Add new markers based on the fetched locations
-      locations.forEach((location) => {
-        L.marker([location.lat, location.lng])
-          .addTo(this.map)
-          .bindPopup(`Location: (${location.lat}, ${location.lng})`);
+      // Add new heatmap layer
+      this.heatLayer = L.heatLayer(heatData, {
+        radius: 10,
+        blur: 10,
+        maxZoom: 8,
       });
+      this.map.addLayer(this.heatLayer);
     },
   },
 };
 </script>
 
 <style scoped>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  text-align: center;
-  color: #2c3e50;
-  margin: 20px;
+.container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.input-container {
-  margin-bottom: 20px;
-}
-
-input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 250px;
-}
-
-button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.map-container {
-  height: 600px;
+.controls {
+  display: flex;
+  gap: 1rem;
   width: 100%;
-  max-width: 800px; /* Set a max width for the map */
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Ensure the map stays within the container */
+  max-width: 600px;
+}
+
+.species-select {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+}
+
+.load-button {
+  padding: 0.5rem 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.load-button:hover {
+  background-color: #45a049;
+}
+
+.load-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.map {
+  width: 100%;
+  height: 600px;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  overflow: hidden;
 }
 </style>

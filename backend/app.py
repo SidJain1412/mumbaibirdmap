@@ -29,7 +29,8 @@ df = pd.read_csv("../../eBird Data 2019-2024/ebd_IN-MH-MS_201901_202401_unv_smp_
 
 df['OBSERVATION COUNT'] = pd.to_numeric(df['OBSERVATION COUNT'], errors='coerce')
 df = df.rename(columns={'LATITUDE': 'lat', 'LONGITUDE': 'lng'})
-unique_species = list(df['COMMON NAME'].value_counts().keys())
+unique_species = list(df['COMMON NAME'].unique())
+# unique_species = list(df['COMMON NAME'].value_counts().keys())
 print(unique_species[:5])
 
 
