@@ -76,8 +76,20 @@ export default {
 
       this.markerCluster = L.markerClusterGroup();
       this.markerCluster = L.markerClusterGroup({
+        iconCreateFunction: function (cluster) {
+          var markers = cluster.getAllChildMarkers();
+          var n = 0;
+          for (var i = 0; i < markers.length; i++) {
+            n += markers[i].count;
+          }
+          return L.divIcon({
+            html: n,
+            className: "mycluster",
+            iconSize: L.point(40, 40),
+          });
+        },
         maxClusterRadius: 50,
-        disableClusteringAtZoom: null, // Changed from 14 to null to always cluster
+        disableClusteringAtZoom: null,
         spiderfyOnMaxZoom: false,
         zoomToBoundsOnClick: true,
         chunkedLoading: true,
@@ -125,9 +137,15 @@ export default {
       const heatData = [];
 
       // Add new markers and heat data
-      locations.forEach(({ lat, lng }) => {
-        this.markerCluster.addLayer(L.marker([lat, lng]));
-        heatData.push([lat, lng]);
+      locations.forEach(({ lat, lng, count }) => {
+        // Add marker with popup showing the count
+        const marker = L.marker([lat, lng]);
+        marker.count = count;
+        marker.bindPopup(`Count: ${count}`);
+        this.markerCluster.addLayer(marker);
+
+        // Add heat data with intensity based on count
+        heatData.push([lat, lng, count]);
       });
 
       // Add new heatmap layer
@@ -186,6 +204,19 @@ export default {
 .load-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+.mycluster {
+  background-color: rgba(0, 139, 139, 0.7); /* Teal background */
+  border-radius: 50%;
+  color: white;
+  text-align: center;
+  width: 40px;
+  height: 40px;
+  line-height: 40px; /* Center text vertically */
+  font-size: 16px; /* Adjust font size */
+  font-weight: bold; /* Make the text bold */
+  border: 2px solid white; /* White border for contrast */
 }
 
 .map {
