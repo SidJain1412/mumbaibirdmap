@@ -18,13 +18,14 @@ app.add_middleware(
     allow_headers=["*"],   # Allows all headers
 )
 
+GRID_SIZE = 0.001
 
 df = pd.read_csv("../../eBird Data 2019-2024/ebd_IN-MH-MS_201901_202401_unv_smp_relSep-2024.txt", delimiter='\t',
                  low_memory=False,
                  usecols=['COMMON NAME',
                    'OBSERVATION COUNT',
                    'LATITUDE', 'LONGITUDE'],
-                 nrows=2000
+                 nrows=500000
                 )
 
 df['OBSERVATION COUNT'] = pd.to_numeric(df['OBSERVATION COUNT'], errors='coerce')
@@ -39,13 +40,26 @@ async def get_speciesList():
     # Mock data for the example
     return unique_species
 
-
+AGGREGATE = True
 @app.get("/locationData/{species_name}", response_model=List[dict])
 async def get_location_data(species_name: str):
     # Mock data for the example
     tdf = df[df['COMMON NAME'] == species_name]
     if(len(tdf)):
-        location_data = tdf.loc[tdf.index.repeat(tdf['OBSERVATION COUNT'])].to_dict(orient='records')
+        if AGGREGATE:
+            # Create grid columns based on latitude and longitude
+            tdf['lat_grid'] = (tdf['lat'] // GRID_SIZE) * GRID_SIZE
+            tdf['lng_grid'] = (tdf['lng'] // GRID_SIZE) * GRID_SIZE
+
+            # Group by grid and aggregate observation counts
+            aggregated_data = (tdf.groupby(['lat_grid', 'lng_grid'])
+                                .agg(count=('OBSERVATION COUNT', 'sum'))
+                                .reset_index())
+
+            # Prepare the final result
+            location_data = aggregated_data.rename(columns={'lat_grid': 'lat', 'lng_grid': 'lng'}).to_dict(orient='records')
+        else:
+             location_data = tdf.loc[tdf.index.repeat(tdf['OBSERVATION COUNT'])].to_dict(orient='records')
         print(location_data[:2])
         return location_data
     return []
