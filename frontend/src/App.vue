@@ -25,6 +25,7 @@
 
 <script>
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster";
 import "leaflet.heat";
 import "leaflet.markercluster/dist/MarkerCluster.css";
@@ -39,8 +40,9 @@ export default {
       map: null,
       markerCluster: null,
       heatLayer: null,
+      isDestroying: false,
       mapConfig: {
-        center: [19.1433, 72.879], // Mumbai coordinates
+        center: [19.1433, 72.879],
         zoom: 11,
         tileLayer: {
           url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -52,60 +54,110 @@ export default {
       },
     };
   },
+  async created() {
+    await this.loadSpeciesList();
+  },
   async mounted() {
     try {
       await this.initializeMap();
-      await this.loadSpeciesList();
+      if (this.selectedSpecies && !this.isDestroying) {
+        await this.loadLocationData();
+      }
     } catch (error) {
       console.error("Failed to initialize map:", error);
     }
   },
+  beforeUnmount() {
+    // Added for Vue 3 compatibility
+    this.cleanup();
+  },
+  watch: {
+    selectedSpecies: {
+      handler(newValue) {
+        if (newValue && !this.isDestroying) {
+          this.loadLocationData();
+        }
+      },
+    },
+  },
   methods: {
-    initializeMap() {
-      if (this.map) return;
+    cleanup() {
+      this.isDestroying = true;
 
-      this.map = L.map(this.$refs.mapContainer).setView(
-        this.mapConfig.center,
-        this.mapConfig.zoom
-      );
+      // Remove heat layer
+      if (this.heatLayer && this.map) {
+        this.map.removeLayer(this.heatLayer);
+        this.heatLayer = null;
+      }
+
+      // Remove marker cluster
+      if (this.markerCluster && this.map) {
+        this.markerCluster.clearLayers();
+        this.map.removeLayer(this.markerCluster);
+        this.markerCluster = null;
+      }
+
+      // Remove map
+      if (this.map) {
+        this.map.remove();
+        this.map = null;
+      }
+    },
+    async initializeMap() {
+      if (this.map || this.isDestroying) return;
+
+      await this.$nextTick();
+
+      if (!this.$refs.mapContainer || this.isDestroying) {
+        throw new Error(
+          "Map container not found or component is being destroyed"
+        );
+      }
+
+      this.map = L.map(this.$refs.mapContainer, {
+        fadeAnimation: true, // Disable animations to prevent race conditions
+        zoomAnimation: true,
+        markerZoomAnimation: false,
+      }).setView(this.mapConfig.center, this.mapConfig.zoom);
 
       L.tileLayer(
         this.mapConfig.tileLayer.url,
         this.mapConfig.tileLayer.options
       ).addTo(this.map);
 
-      this.markerCluster = L.markerClusterGroup();
       this.markerCluster = L.markerClusterGroup({
-        iconCreateFunction: function (cluster) {
-          var markers = cluster.getAllChildMarkers();
-          var n = 0;
-          for (var i = 0; i < markers.length; i++) {
-            n += markers[i].count;
-          }
+        iconCreateFunction: (cluster) => {
+          const count = cluster
+            .getAllChildMarkers()
+            .reduce((acc, marker) => acc + (marker.options.count || 0), 0);
           return L.divIcon({
-            html: n,
+            html: `<span>${count}</span>`,
             className: "mycluster",
             iconSize: L.point(40, 40),
           });
         },
         maxClusterRadius: 50,
-        disableClusteringAtZoom: null,
-        spiderfyOnMaxZoom: false,
+        spiderfyOnMaxZoom: true,
         zoomToBoundsOnClick: true,
         chunkedLoading: true,
-        animate: false,
+        animate: false, // Disable animations
+        animateAddingMarkers: false,
       });
-      this.map.addLayer(this.markerCluster);
+
+      if (!this.isDestroying) {
+        this.map.addLayer(this.markerCluster);
+      }
     },
     async loadSpeciesList() {
+      if (this.isDestroying) return;
+
       try {
         const response = await fetch("http://localhost:8000/speciesList");
         if (!response.ok) throw new Error("Failed to fetch species list");
 
         this.speciesList = await response.json();
-        if (this.speciesList.length) {
+        if (this.speciesList.length && !this.isDestroying) {
           this.selectedSpecies = this.speciesList[0];
-          await this.loadLocationData();
         }
       } catch (error) {
         console.error("Error loading species list:", error);
@@ -113,54 +165,94 @@ export default {
       }
     },
     async loadLocationData() {
-      if (!this.selectedSpecies) return;
+      if (!this.selectedSpecies || !this.map || this.isDestroying) return;
 
       try {
         const response = await fetch(
-          `http://localhost:8000/locationData/${this.selectedSpecies}`
+          `http://localhost:8000/locationData/${encodeURIComponent(
+            this.selectedSpecies
+          )}`
         );
         if (!response.ok) throw new Error("Failed to fetch location data");
 
         const locations = await response.json();
-        this.updateMap(locations);
+        if (!this.isDestroying) {
+          await this.updateMap(locations);
+        }
       } catch (error) {
         console.error("Error loading location data:", error);
       }
     },
-    updateMap(locations) {
+    async updateMap(locations) {
+      if (this.isDestroying) return;
+
       // Clear existing layers
-      this.markerCluster.clearLayers();
-      if (this.heatLayer) {
+      if (this.markerCluster) {
+        this.markerCluster.clearLayers();
+      }
+
+      if (this.heatLayer && this.map && this.map.hasLayer(this.heatLayer)) {
         this.map.removeLayer(this.heatLayer);
+        this.heatLayer = null;
       }
 
       const heatData = [];
+      const bounds = L.latLngBounds();
 
       // Add new markers and heat data
       locations.forEach(({ lat, lng, count }) => {
-        // Add marker with popup showing the count
-        const marker = L.marker([lat, lng]);
-        marker.count = count;
+        if (this.isDestroying) return;
+
+        const latLng = [lat, lng];
+
+        const marker = L.marker(latLng, {
+          count,
+          // Disable marker animations
+          animate: false,
+        });
         marker.bindPopup(`Count: ${count}`);
-        this.markerCluster.addLayer(marker);
 
-        // Add heat data with intensity based on count
-        heatData.push([lat, lng, count]);
+        if (this.markerCluster && !this.isDestroying) {
+          this.markerCluster.addLayer(marker);
+        }
+
+        heatData.push([lat, lng, Math.min(count, 30)]);
+        bounds.extend(latLng);
       });
 
-      // Add new heatmap layer
-      this.heatLayer = L.heatLayer(heatData, {
-        radius: 10,
-        blur: 10,
-        maxZoom: 8,
-      });
-      this.map.addLayer(this.heatLayer);
+      if (this.isDestroying) return;
+
+      // Only add heatmap if we have data
+      if (heatData.length > 0 && this.map && !this.isDestroying) {
+        this.heatLayer = L.heatLayer(heatData, {
+          radius: 25,
+          blur: 15,
+          maxZoom: 10,
+          max: 30,
+          gradient: {
+            0.4: "blue",
+            0.6: "cyan",
+            0.8: "lime",
+            0.9: "yellow",
+            1.0: "red",
+          },
+        });
+
+        if (!this.isDestroying) {
+          this.map.addLayer(this.heatLayer);
+          this.map.fitBounds(bounds, {
+            padding: [50, 50],
+            animate: false, // Disable animation for bounds fitting
+          });
+        }
+      }
     },
   },
 };
 </script>
 
-<style scoped>
+<style>
+/* Styles remain the same */
 .container {
   display: flex;
   flex-direction: column;
@@ -206,24 +298,33 @@ export default {
   cursor: not-allowed;
 }
 
-.mycluster {
-  background-color: rgba(0, 139, 139, 0.7); /* Teal background */
-  border-radius: 50%;
-  color: white;
-  text-align: center;
-  width: 40px;
-  height: 40px;
-  line-height: 40px; /* Center text vertically */
-  font-size: 16px; /* Adjust font size */
-  font-weight: bold; /* Make the text bold */
-  border: 2px solid white; /* White border for contrast */
-}
-
 .map {
   width: 100%;
   height: 600px;
   border-radius: 0.5rem;
   border: 1px solid #ccc;
   overflow: hidden;
+}
+
+.mycluster {
+  background-color: rgba(0, 139, 139, 0.9);
+  border-radius: 50%;
+  color: white;
+  text-align: center;
+  width: 40px !important;
+  height: 40px !important;
+  line-height: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mycluster span {
+  display: block;
+  text-align: center;
+  width: 100%;
 }
 </style>
