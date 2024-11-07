@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings('ignore')
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
@@ -24,11 +26,11 @@ df = pd.read_csv("../../eBird Data 2019-2024/ebd_IN-MH-MS_201901_202401_unv_smp_
                  low_memory=False,
                  usecols=['COMMON NAME',
                    'OBSERVATION COUNT',
-                   'LATITUDE', 'LONGITUDE'],
-                 nrows=500000
+                   'LATITUDE', 'LONGITUDE']
                 )
 
 df['OBSERVATION COUNT'] = pd.to_numeric(df['OBSERVATION COUNT'], errors='coerce')
+df['OBSERVATION COUNT'].clip(upper=500, inplace=True)
 df = df.rename(columns={'LATITUDE': 'lat', 'LONGITUDE': 'lng'})
 unique_species = list(df['COMMON NAME'].unique())
 # unique_species = list(df['COMMON NAME'].value_counts().keys())
@@ -48,18 +50,19 @@ async def get_location_data(species_name: str):
     if(len(tdf)):
         if AGGREGATE:
             # Create grid columns based on latitude and longitude
-            tdf['lat_grid'] = (tdf['lat'] // GRID_SIZE) * GRID_SIZE
-            tdf['lng_grid'] = (tdf['lng'] // GRID_SIZE) * GRID_SIZE
+            tdf.loc[:, 'lat_grid'] = (tdf['lat'] // GRID_SIZE) * GRID_SIZE
+            tdf.loc[:, 'lng_grid'] = (tdf['lng'] // GRID_SIZE) * GRID_SIZE
 
             # Group by grid and aggregate observation counts
             aggregated_data = (tdf.groupby(['lat_grid', 'lng_grid'])
                                 .agg(count=('OBSERVATION COUNT', 'sum'))
                                 .reset_index())
+            aggregated_data['count'].clip(upper=1000, inplace=True)
 
             # Prepare the final result
             location_data = aggregated_data.rename(columns={'lat_grid': 'lat', 'lng_grid': 'lng'}).to_dict(orient='records')
         else:
-             location_data = tdf.loc[tdf.index.repeat(tdf['OBSERVATION COUNT'])].to_dict(orient='records')
+            location_data = tdf.loc[tdf.index.repeat(tdf['OBSERVATION COUNT'])].to_dict(orient='records')
         print(location_data[:2])
         return location_data
     return []
