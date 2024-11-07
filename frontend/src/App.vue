@@ -1,21 +1,13 @@
 <template>
   <div class="container">
     <div class="controls">
-      <select
-        v-model="selectedSpecies"
-        class="species-select"
-        :disabled="!speciesList.length"
-      >
+      <select v-model="selectedSpecies" class="species-select" :disabled="!speciesList.length">
         <option value="" disabled>Select Species</option>
         <option v-for="species in speciesList" :key="species" :value="species">
           {{ species }}
         </option>
       </select>
-      <button
-        @click="loadLocationData"
-        :disabled="!selectedSpecies"
-        class="load-button"
-      >
+      <button @click="loadLocationData" :disabled="!selectedSpecies" class="load-button">
         Show Locations
       </button>
     </div>
@@ -68,36 +60,30 @@ export default {
     }
   },
   beforeUnmount() {
-    // Added for Vue 3 compatibility
     this.cleanup();
   },
   watch: {
-    selectedSpecies: {
-      handler(newValue) {
-        if (newValue && !this.isDestroying) {
-          this.loadLocationData();
-        }
-      },
+    selectedSpecies(newValue) {
+      if (newValue && !this.isDestroying) {
+        this.loadLocationData();
+      }
     },
   },
   methods: {
     cleanup() {
       this.isDestroying = true;
 
-      // Remove heat layer
-      if (this.heatLayer && this.map) {
+      if (this.heatLayer) {
         this.map.removeLayer(this.heatLayer);
         this.heatLayer = null;
       }
 
-      // Remove marker cluster
-      if (this.markerCluster && this.map) {
+      if (this.markerCluster) {
         this.markerCluster.clearLayers();
         this.map.removeLayer(this.markerCluster);
         this.markerCluster = null;
       }
 
-      // Remove map
       if (this.map) {
         this.map.remove();
         this.map = null;
@@ -109,27 +95,20 @@ export default {
       await this.$nextTick();
 
       if (!this.$refs.mapContainer || this.isDestroying) {
-        throw new Error(
-          "Map container not found or component is being destroyed"
-        );
+        throw new Error("Map container not found or component is being destroyed");
       }
 
       this.map = L.map(this.$refs.mapContainer, {
-        fadeAnimation: true, // Disable animations to prevent race conditions
+        fadeAnimation: true,
         zoomAnimation: true,
         markerZoomAnimation: false,
       }).setView(this.mapConfig.center, this.mapConfig.zoom);
 
-      L.tileLayer(
-        this.mapConfig.tileLayer.url,
-        this.mapConfig.tileLayer.options
-      ).addTo(this.map);
+      L.tileLayer(this.mapConfig.tileLayer.url, this.mapConfig.tileLayer.options).addTo(this.map);
 
       this.markerCluster = L.markerClusterGroup({
         iconCreateFunction: (cluster) => {
-          const count = cluster
-            .getAllChildMarkers()
-            .reduce((acc, marker) => acc + (marker.options.count || 0), 0);
+          const count = cluster.getAllChildMarkers().reduce((acc, marker) => acc + (marker.options.count || 0), 0);
           return L.divIcon({
             html: `<span>${count}</span>`,
             className: "mycluster",
@@ -140,7 +119,7 @@ export default {
         spiderfyOnMaxZoom: true,
         zoomToBoundsOnClick: true,
         chunkedLoading: true,
-        animate: false, // Disable animations
+        animate: false,
         animateAddingMarkers: false,
       });
 
@@ -168,11 +147,7 @@ export default {
       if (!this.selectedSpecies || !this.map || this.isDestroying) return;
 
       try {
-        const response = await fetch(
-          `http://localhost:8000/locationData/${encodeURIComponent(
-            this.selectedSpecies
-          )}`
-        );
+        const response = await fetch(`http://localhost:8000/locationData/${encodeURIComponent(this.selectedSpecies)}`);
         if (!response.ok) throw new Error("Failed to fetch location data");
 
         const locations = await response.json();
@@ -186,12 +161,11 @@ export default {
     async updateMap(locations) {
       if (this.isDestroying) return;
 
-      // Clear existing layers
       if (this.markerCluster) {
         this.markerCluster.clearLayers();
       }
 
-      if (this.heatLayer && this.map && this.map.hasLayer(this.heatLayer)) {
+      if (this.heatLayer && this.map.hasLayer(this.heatLayer)) {
         this.map.removeLayer(this.heatLayer);
         this.heatLayer = null;
       }
@@ -199,17 +173,11 @@ export default {
       const heatData = [];
       const bounds = L.latLngBounds();
 
-      // Add new markers and heat data
       locations.forEach(({ lat, lng, count }) => {
         if (this.isDestroying) return;
 
         const latLng = [lat, lng];
-
-        const marker = L.marker(latLng, {
-          count,
-          // Disable marker animations
-          animate: false,
-        });
+        const marker = L.marker(latLng, { count, animate: false });
         marker.bindPopup(`Count: ${count}`);
 
         if (this.markerCluster && !this.isDestroying) {
@@ -222,8 +190,7 @@ export default {
 
       if (this.isDestroying) return;
 
-      // Only add heatmap if we have data
-      if (heatData.length > 0 && this.map && !this.isDestroying) {
+      if (heatData.length > 0 && this.map) {
         this.heatLayer = L.heatLayer(heatData, {
           radius: 25,
           blur: 15,
@@ -240,10 +207,7 @@ export default {
 
         if (!this.isDestroying) {
           this.map.addLayer(this.heatLayer);
-          this.map.fitBounds(bounds, {
-            padding: [50, 50],
-            animate: false, // Disable animation for bounds fitting
-          });
+          this.map.fitBounds(bounds, { padding: [50, 50], animate: false });
         }
       }
     },
@@ -252,7 +216,6 @@ export default {
 </script>
 
 <style>
-/* Styles remain the same */
 .container {
   display: flex;
   flex-direction: column;
