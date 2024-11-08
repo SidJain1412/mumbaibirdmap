@@ -20,7 +20,7 @@
         Surprise Me
       </button>
     </div>
-    <div ref="mapContainer" class="map" />
+    <div ref="mapContainer" class="map-container" />
   </div>
 </template>
 
@@ -49,7 +49,7 @@ export default {
           url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
           options: {
             maxZoom: 19,
-            attribution: "© OpenStreetMap",
+            attribution: "© OpenStreetMap contributors",
           },
         },
       },
@@ -231,11 +231,32 @@ export default {
 </script>
 
 <style>
+/* Font Import */
+@font-face {
+  font-family: 'Hubot Sans';
+  src: url('https://github.githubassets.com/static/fonts/github/hubot-sans.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Hubot Sans';
+  src: url('https://github.githubassets.com/static/fonts/github/hubot-sans-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Global Font Settings */
+* {
+  font-family: 'Hubot Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Layout & Container Styles */
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 0.5rem;
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
@@ -243,64 +264,55 @@ export default {
   background-color: #f5f7fa;
 }
 
+/* Header Styles */
 .header {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.2rem;
 }
 
 .header h1 {
   color: #2c3e50;
   margin-bottom: 0.5rem;
-  font-size: 2.5rem;
+  font-size: 2.75rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.1;
 }
 
 .header p {
   color: #666;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  font-weight: 400;
 }
 
+/* Controls Section */
 .controls {
   display: flex;
   gap: 1rem;
   width: 100%;
   max-width: 800px;
   background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1000;
 }
 
-.species-select {
-  flex: 1;
-}
-
-/* Vue Select Custom Styles */
-.v-select {
-  font-size: 1rem;
-}
-
-.v-select .vs__dropdown-toggle {
-  padding: 4px 0;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-}
-
-.v-select .vs__selected {
-  color: #2c3e50;
-}
-
-.v-select .vs__search::placeholder {
-  color: #666;
-}
-
-.load-button, .surprise-button {
-  padding: 0.75rem 1.5rem;
+/* Button Styles */
+.load-button,
+.surprise-button {
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Hubot Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 .load-button {
@@ -308,104 +320,89 @@ export default {
   color: white;
 }
 
-.load-button:hover:not(:disabled) {
-  background-color: #45a049;
-  transform: translateY(-1px);
-}
-
 .surprise-button {
   background-color: #ff9800;
   color: white;
 }
 
+.load-button:hover:not(:disabled),
+.surprise-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.load-button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
 .surprise-button:hover {
   background-color: #f57c00;
-  transform: translateY(-1px);
 }
 
 .load-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
-.map {
+/* Map Styles */
+.map-container {
   width: 100%;
   height: 600px;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
 /* Cluster Marker Styles */
 .mycluster {
-  background-color: rgba(0, 139, 139, 0.9);
+  background: linear-gradient(45deg, #008b8b, #20b2aa);
   border-radius: 50%;
   color: white;
-  text-align: center;
   width: 40px !important;
   height: 40px !important;
-  line-height: 40px;
   font-size: 16px;
   font-weight: bold;
   border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.mycluster span {
-  display: block;
-  text-align: center;
-  width: 100%;
-}
-
-/* Add these styles for the new multiselect component */
-.multiselect {
-  min-height: 44px;
-}
-
-.multiselect-search {
-  padding: 8px;
-}
-
-.multiselect-option {
-  padding: 8px 12px;
-}
-
-.multiselect-option.is-pointed {
-  background: #f3f4f6;
-}
-
-.multiselect-option.is-selected {
-  background: #4caf50;
-  color: white;
-}
-.controls {
-  position: relative;  /* Add this */
-  z-index: 1000;      /* Add this */
-}
-
-/* If using vue-select */
+/* Vue Select Styles */
 .v-select {
+  flex: 1;
   position: relative;
   z-index: 1000;
+  font-size: 1rem;
+  font-family: 'Hubot Sans', system-ui, -apple-system, sans-serif;
 }
 
-/* If using @vueform/multiselect */
-.multiselect {
-  position: relative;
-  z-index: 1000;
+.v-select .vs__dropdown-toggle {
+  padding: 6px 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #fff;
 }
 
-.multiselect-dropdown {
-  z-index: 1000;
+.v-select .vs__selected {
+  color: #2c3e50;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-/* Ensure map stays below */
-.map {
-  z-index: 1;  /* Add this */
+.v-select .vs__search::placeholder {
+  color: #94a3b8;
 }
 
+.v-select .vs__dropdown-menu {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove duplicate multiselect styles */
 </style>
