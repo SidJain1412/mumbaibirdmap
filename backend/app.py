@@ -26,9 +26,11 @@ df = pd.read_csv("../../eBird Data 2019-2024/ebd_IN-MH-MS_201901_202401_unv_smp_
                  low_memory=False,
                  usecols=['COMMON NAME',
                    'OBSERVATION COUNT',
-                   'LATITUDE', 'LONGITUDE']
+                   'LATITUDE', 'LONGITUDE',
+                   'CATEGORY']
                 )
 
+df = df[df['CATEGORY'] == 'species']
 df['OBSERVATION COUNT'] = pd.to_numeric(df['OBSERVATION COUNT'], errors='coerce')
 df['OBSERVATION COUNT'].clip(upper=500, inplace=True)
 df = df.rename(columns={'LATITUDE': 'lat', 'LONGITUDE': 'lng'})
