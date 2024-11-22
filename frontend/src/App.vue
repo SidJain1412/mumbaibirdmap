@@ -94,7 +94,7 @@ export default {
     };
   },
   async created() {
-    await this.loadSpeciesList();
+    await this.fetchSpeciesList();
   },
   async mounted() {
     try {
@@ -179,41 +179,39 @@ export default {
         this.map.addLayer(this.markerCluster);
       }
     },
-    async loadSpeciesList() {
-      if (this.isDestroying) return;
-
+    async fetchSpeciesList() {
       try {
-        const response = await fetch("http://localhost:8000/speciesList");
+        const response = await fetch("/birdMap/data/species-list.json");
         if (!response.ok) throw new Error("Failed to fetch species list");
-
-        this.speciesList = await response.json();
-        if (this.speciesList.length && !this.isDestroying) {
-          this.selectedSpecies = this.speciesList[0];
-        }
+        const data = await response.json();
+        this.speciesList = data;
       } catch (error) {
-        console.error("Error loading species list:", error);
-        this.speciesList = [];
+        console.error("Error fetching species list:", error);
       }
     },
     async loadLocationData() {
-      if (!this.selectedSpecies || !this.map || this.isDestroying) return;
-
+      if (!this.selectedSpecies) return;
+      
       try {
-        const monthParam = (this.selectedMonth && this.selectedMonth.value !== null) ? 
-          `?month=${this.selectedMonth}` : '';
-        
-        const response = await fetch(
-          `http://localhost:8000/locationData/${encodeURIComponent(this.selectedSpecies)}${monthParam}`
-        );
+        const response = await fetch("/birdMap/data/observations.json");
         if (!response.ok) throw new Error("Failed to fetch location data");
-
-        const locations = await response.json();
-        if (!this.isDestroying) {
-          await this.updateMap(locations);
-          await this.loadMonthlyData();
+        const allData = await response.json();
+        
+        // Get data for selected species
+        const speciesData = allData[this.selectedSpecies];
+        
+        // Filter by month if selected
+        let locationData;
+        if (this.selectedMonth) {
+          locationData = speciesData[this.selectedMonth] || [];
+        } else {
+          // Combine all months
+          locationData = Object.values(speciesData).flat();
         }
+
+        this.updateMap(locationData);
       } catch (error) {
-        console.error("Error loading location data:", error);
+        console.error("Error fetching location data:", error);
       }
     },
     async updateMap(locations) {
@@ -273,21 +271,6 @@ export default {
       if (this.speciesList.length > 0) {
         const randomIndex = Math.floor(Math.random() * this.speciesList.length);
         this.selectedSpecies = this.speciesList[randomIndex];
-      }
-    },
-    async loadMonthlyData() {
-      if (!this.selectedSpecies) return;
-      
-      try {
-        const response = await fetch(
-          `http://localhost:8000/monthlyData/${encodeURIComponent(this.selectedSpecies)}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch monthly data");
-        
-        this.monthlyData = await response.json();
-      } catch (error) {
-        console.error("Error loading monthly data:", error);
-        this.monthlyData = [];
       }
     },
   },
