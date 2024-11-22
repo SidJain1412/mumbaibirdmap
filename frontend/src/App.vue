@@ -181,7 +181,7 @@ export default {
     },
     async fetchSpeciesList() {
       try {
-        const response = await fetch("/birdMap/data/species-list.json");
+        const response = await fetch("/data/species-list.json");
         if (!response.ok) throw new Error("Failed to fetch species list");
         const data = await response.json();
         this.speciesList = data;
@@ -193,7 +193,7 @@ export default {
       if (!this.selectedSpecies) return;
       
       try {
-        const response = await fetch("/birdMap/data/observations.json");
+        const response = await fetch("/data/observations.json");
         if (!response.ok) throw new Error("Failed to fetch location data");
         const allData = await response.json();
         
