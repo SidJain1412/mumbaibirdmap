@@ -28,6 +28,11 @@
         Surprise Me
       </button>
     </div>
+    <MonthlyPlot 
+      v-if="monthlyData.length"
+      :monthly-data="monthlyData" 
+      class="monthly-plot"
+    />
     <div ref="mapContainer" class="map-container" />
   </div>
 </template>
@@ -39,9 +44,13 @@ import "leaflet.markercluster";
 import "leaflet.heat";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import MonthlyPlot from './components/MonthlyPlot.vue'
 
 export default {
   name: "SpeciesMap",
+  components: {
+    MonthlyPlot
+  },
   data() {
     return {
       selectedSpecies: "",
@@ -77,6 +86,7 @@ export default {
           },
         },
       },
+      monthlyData: [],
     };
   },
   async created() {
@@ -185,7 +195,9 @@ export default {
       if (!this.selectedSpecies || !this.map || this.isDestroying) return;
 
       try {
-        const monthParam = this.selectedMonth.value !== null ? `?month=${this.selectedMonth}` : '';
+        const monthParam = (this.selectedMonth && this.selectedMonth.value !== null) ? 
+          `?month=${this.selectedMonth}` : '';
+        
         const response = await fetch(
           `http://localhost:8000/locationData/${encodeURIComponent(this.selectedSpecies)}${monthParam}`
         );
@@ -194,6 +206,7 @@ export default {
         const locations = await response.json();
         if (!this.isDestroying) {
           await this.updateMap(locations);
+          await this.loadMonthlyData();
         }
       } catch (error) {
         console.error("Error loading location data:", error);
@@ -256,6 +269,21 @@ export default {
       if (this.speciesList.length > 0) {
         const randomIndex = Math.floor(Math.random() * this.speciesList.length);
         this.selectedSpecies = this.speciesList[randomIndex];
+      }
+    },
+    async loadMonthlyData() {
+      if (!this.selectedSpecies) return;
+      
+      try {
+        const response = await fetch(
+          `http://localhost:8000/monthlyData/${encodeURIComponent(this.selectedSpecies)}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch monthly data");
+        
+        this.monthlyData = await response.json();
+      } catch (error) {
+        console.error("Error loading monthly data:", error);
+        this.monthlyData = [];
       }
     },
   },
@@ -440,6 +468,10 @@ export default {
 .month-select {
   min-width: 150px;
   max-width: 200px;
+}
+
+.monthly-plot {
+  margin-bottom: 1rem;
 }
 
 </style>

@@ -60,3 +60,14 @@ async def get_location_data(species_name: str, month: int = None):
             location_data = tdf.loc[tdf.index.repeat(tdf['OBSERVATION COUNT'])].to_dict(orient='records')
         return location_data
     return []
+
+@app.get("/monthlyData/{species_name}")
+async def get_monthly_data(species_name: str):
+    # Filter by species name
+    species_data = df[df['COMMON NAME'] == species_name].copy()
+    # Group by month and sum observations
+    monthly_counts = species_data.groupby('month')['OBSERVATION COUNT'].sum()
+    # Ensure all months are represented (1-12)
+    all_months = pd.Series(0, index=range(1, 13))
+    monthly_counts = monthly_counts.reindex(all_months.index).fillna(0)
+    return monthly_counts.tolist()
