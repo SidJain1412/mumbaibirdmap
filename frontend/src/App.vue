@@ -83,10 +83,10 @@ export default {
         center: [19.1433, 72.879],
         zoom: 11,
         tileLayer: {
-          url: "https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",
+          url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
           options: {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+            attribution: "© OpenStreetMap contributors",
           },
         },
       },
