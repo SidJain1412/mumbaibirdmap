@@ -183,7 +183,7 @@ export default {
     },
     async fetchSpeciesList() {
       try {
-        const response = await fetch("MumbaiBirdMap/data/species-list.json");
+        const response = await fetch("data/species-list.json");
         if (!response.ok) throw new Error("Failed to fetch species list");
         const data = await response.json();
         this.speciesList = data;
@@ -223,7 +223,7 @@ export default {
 
       // Fetch data for the species
       const filename = species.toLowerCase().replace(" ", "-");
-      const response = await fetch(`MumbaiBirdMap/data/species/${filename}.json`);
+      const response = await fetch(`data/species/${filename}.json`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch data for ${species}`);
