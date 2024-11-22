@@ -11,6 +11,7 @@
     "@vueform/multiselect": "^2.6.10",
     "axios": "^1.7.7",
     "chart.js": "^4.4.1",
+    "vue-chartjs": "^5.3.2",
     "core-js": "^3.8.3",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",
