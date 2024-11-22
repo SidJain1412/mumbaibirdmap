@@ -91,6 +91,8 @@ export default {
         },
       },
       monthlyData: [],
+      speciesCache: {},
+      isLoading: false,
     };
   },
   async created() {
@@ -192,27 +194,44 @@ export default {
     async loadLocationData() {
       if (!this.selectedSpecies) return;
       
+      this.isLoading = true;
+      
       try {
-        const response = await fetch("/data/observations.json");
-        if (!response.ok) throw new Error("Failed to fetch location data");
-        const allData = await response.json();
-        
-        // Get data for selected species
-        const speciesData = allData[this.selectedSpecies];
+        // Get species data from cache or fetch it
+        const speciesData = await this.getSpeciesData(this.selectedSpecies);
         
         // Filter by month if selected
         let locationData;
-        if (this.selectedMonth) {
-          locationData = speciesData[this.selectedMonth] || [];
+        if (this.selectedMonth.value) {
+          locationData = speciesData[this.selectedMonth.value] || [];
         } else {
-          // Combine all months
           locationData = Object.values(speciesData).flat();
         }
 
-        this.updateMap(locationData);
+        await this.updateMap(locationData);
       } catch (error) {
-        console.error("Error fetching location data:", error);
+        console.error("Error loading location data:", error);
+      } finally {
+        this.isLoading = false;
       }
+    },
+    async getSpeciesData(species) {
+      // Check cache first
+      if (this.speciesCache[species]) {
+        return this.speciesCache[species];
+      }
+
+      // Fetch data for the species
+      const filename = species.toLowerCase().replace(" ", "-");
+      const response = await fetch(`/data/species/${filename}.json`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data for ${species}`);
+      }
+      
+      const data = await response.json();
+      this.speciesCache[species] = data;
+      return data;
     },
     async updateMap(locations) {
       if (this.isDestroying) return;
@@ -454,5 +473,31 @@ body {
 .month-select {
   min-width: 150px;
   max-width: 200px;
+}
+
+/* Add loading indicator styles */
+.controls {
+  position: relative;
+}
+
+.controls::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+}
+
+.controls.loading::after {
+  display: flex;
+  content: "Loading...";
+  font-weight: 500;
+  color: #2E7D32;
 }
 </style>

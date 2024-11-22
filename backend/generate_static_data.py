@@ -36,12 +36,15 @@ for species in species_list:
 
     observations[species] = monthly_data
 
-# Create output directory
-os.makedirs("../frontend/public/data", exist_ok=True)
+# Create output directories
+os.makedirs("../frontend/public/data/species", exist_ok=True)
 
-# Save files
+# Save species list
 with open("../frontend/public/data/species-list.json", "w") as f:
     json.dump(species_list, f)
 
-with open("../frontend/public/data/observations.json", "w") as f:
-    json.dump(observations, f)
+# Save individual species files
+for species in species_list:
+    species_filename = species.lower().replace(" ", "-")
+    with open(f"../frontend/public/data/species/{species_filename}.json", "w") as f:
+        json.dump(observations[species], f)
