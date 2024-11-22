@@ -3,6 +3,7 @@
     <header class="header">
       <h1>Mumbai Bird Map</h1>
       <p>Explore bird sightings across Mumbai</p>
+      <p style="font-size: 0.8rem;">Made with ❤️ by <a href="https://twitter.com/sidjain1412" target="_blank" rel="noopener">Siddharth Jain</a></p>
     </header>
     <div class="controls">
       <v-select
@@ -25,7 +26,7 @@
         Show Locations
       </button>
       <button @click="surpriseMe" class="surprise-button">
-        Surprise Me
+        Random Species!
       </button>
     </div>
     <MonthlyPlot 
@@ -333,6 +334,7 @@ body {
   letter-spacing: -0.03em;
   background: linear-gradient(45deg, #1a5f7a, #2E7D32);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

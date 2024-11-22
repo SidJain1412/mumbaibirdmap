@@ -3,7 +3,7 @@
     <div class="info-content">
       <h3>About this Map</h3>
       <p>This map uses bird observation data from <a href="https://ebird.org" target="_blank" rel="noopener">eBird</a>, 
-      covering the period from January 2019 to January 2024.</p>
+      covering the period from January 2019 to January 2024, for the region Mumbai Suburban, India.</p>
       
       <h4>Methodology</h4>
       <p>Data points are aggregated into small geographic cells to create both the heatmap and cluster views. 
