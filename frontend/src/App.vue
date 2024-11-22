@@ -13,6 +13,14 @@
         placeholder="Select or search for a bird species"
         class="species-select"
       />
+      <v-select
+        v-model="selectedMonth"
+        :options="months"
+        :searchable="false"
+        :disabled="!months.length"
+        placeholder="All Months"
+        class="month-select"
+      />
       <button @click="loadLocationData" :disabled="!selectedSpecies" class="load-button">
         Show Locations
       </button>
@@ -37,6 +45,22 @@ export default {
   data() {
     return {
       selectedSpecies: "",
+      selectedMonth: { value: null, label: 'All Months' },
+      months: [
+        { value: null, label: 'All Months' },
+        { value: 1, label: 'January' },
+        { value: 2, label: 'February' },
+        { value: 3, label: 'March' },
+        { value: 4, label: 'April' },
+        { value: 5, label: 'May' },
+        { value: 6, label: 'June' },
+        { value: 7, label: 'July' },
+        { value: 8, label: 'August' },
+        { value: 9, label: 'September' },
+        { value: 10, label: 'October' },
+        { value: 11, label: 'November' },
+        { value: 12, label: 'December' },
+      ],
       speciesList: [],
       map: null,
       markerCluster: null,
@@ -74,6 +98,11 @@ export default {
   watch: {
     selectedSpecies(newValue) {
       if (newValue && !this.isDestroying) {
+        this.loadLocationData();
+      }
+    },
+    selectedMonth() {
+      if (this.selectedSpecies && !this.isDestroying) {
         this.loadLocationData();
       }
     },
@@ -156,7 +185,10 @@ export default {
       if (!this.selectedSpecies || !this.map || this.isDestroying) return;
 
       try {
-        const response = await fetch(`http://localhost:8000/locationData/${encodeURIComponent(this.selectedSpecies)}`);
+        const monthParam = this.selectedMonth.value !== null ? `?month=${this.selectedMonth}` : '';
+        const response = await fetch(
+          `http://localhost:8000/locationData/${encodeURIComponent(this.selectedSpecies)}${monthParam}`
+        );
         if (!response.ok) throw new Error("Failed to fetch location data");
 
         const locations = await response.json();
@@ -291,7 +323,7 @@ export default {
   display: flex;
   gap: 1rem;
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
   background: white;
   padding: 1rem;
   border-radius: 12px;
@@ -405,4 +437,9 @@ export default {
 }
 
 /* Remove duplicate multiselect styles */
+.month-select {
+  min-width: 150px;
+  max-width: 200px;
+}
+
 </style>
