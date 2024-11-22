@@ -20,20 +20,9 @@ app.add_middleware(
     allow_headers=["*"],   # Allows all headers
 )
 
-GRID_SIZE = 0.001
+GRID_SIZE = 0.0015
 
-df = pd.read_csv("../../eBird Data 2019-2024/ebd_IN-MH-MS_201901_202401_unv_smp_relSep-2024.txt", delimiter='\t',
-                 low_memory=False,
-                 usecols=['COMMON NAME',
-                   'OBSERVATION COUNT',
-                   'LATITUDE', 'LONGITUDE',
-                   'CATEGORY']
-                )
-
-df = df[df['CATEGORY'] == 'species']
-df['OBSERVATION COUNT'] = pd.to_numeric(df['OBSERVATION COUNT'], errors='coerce')
-df['OBSERVATION COUNT'].clip(upper=500, inplace=True)
-df = df.rename(columns={'LATITUDE': 'lat', 'LONGITUDE': 'lng'})
+df = pd.read_csv("data.csv")
 unique_species = list(df['COMMON NAME'].unique())
 # unique_species = list(df['COMMON NAME'].value_counts().keys())
 print(unique_species[:5])
