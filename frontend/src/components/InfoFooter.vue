@@ -20,28 +20,30 @@
   width: 100%;
   max-width: 1000px;
   margin: 1rem auto 0;
-  padding: 1rem;
+  padding: 1.25rem;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .info-content {
-  color: #4a5568;
+  color: #475569;
 }
 
 h3 {
   font-size: 1.1rem;
-  color: #2d3748;
-  margin: 0 0 0.5rem 0;
+  color: #0f172a;
+  margin: 0 0 0.75rem 0;
+  font-weight: 600;
 }
 
 h4 {
   font-size: 1rem;
-  color: #2d3748;
-  margin: 1rem 0 0.5rem 0;
+  color: #0f172a;
+  margin: 1.25rem 0 0.5rem 0;
+  font-weight: 600;
 }
 
 p {
@@ -49,17 +51,21 @@ p {
 }
 
 .attribution {
-  margin-top: 1rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
   font-size: 0.85rem;
-  color: #718096;
+  color: #64748b;
 }
 
 a {
-  color: #4caf50;
+  color: #2E7D32;
   text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-  text-decoration: underline;
+  color: #1B5E20;
 }
 </style> 

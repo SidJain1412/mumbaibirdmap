@@ -82,10 +82,10 @@ export default {
         center: [19.1433, 72.879],
         zoom: 11,
         tileLayer: {
-          url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          url: "https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",
           options: {
             maxZoom: 19,
-            attribution: "© OpenStreetMap contributors",
+            attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
           },
         },
       },
@@ -295,166 +295,154 @@ export default {
 
 <style>
 /* Font Import */
-@font-face {
-  font-family: 'Hubot Sans';
-  src: url('https://github.githubassets.com/static/fonts/github/hubot-sans.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-@font-face {
-  font-family: 'Hubot Sans';
-  src: url('https://github.githubassets.com/static/fonts/github/hubot-sans-bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-}
-
-/* Global Font Settings */
 * {
-  font-family: 'Hubot Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
 }
 
-/* Layout & Container Styles */
+body {
+  margin: 0;
+  padding: 0;
+  background: #f8fafc;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 2rem 2rem 1rem;
+  gap: 1rem;
+  padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
-  background-color: #f5f7fa;
 }
 
-/* Header Styles */
 .header {
   text-align: center;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.5rem;
+  position: relative;
 }
 
 .header h1 {
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
-  font-size: 2.75rem;
+  color: #0f172a;
+  margin: 0;
+  font-size: 2.5rem;
   font-weight: 700;
-  letter-spacing: -1px;
-  line-height: 1.1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(45deg, #1a5f7a, #2E7D32);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .header p {
-  color: #666;
-  font-size: 1.25rem;
-  line-height: 1.5;
+  color: #64748b;
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
   font-weight: 400;
 }
 
-/* Controls Section */
 .controls {
   display: flex;
   gap: 1rem;
   width: 100%;
   max-width: 1000px;
   background: white;
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.25rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   position: relative;
   z-index: 1000;
 }
 
-/* Button Styles */
 .load-button,
 .surprise-button {
-  padding: 0.5rem 1rem;
+  padding: 0.625rem 1.25rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-family: 'Hubot Sans', system-ui, -apple-system, sans-serif;
-  letter-spacing: -0.01em;
 }
 
 .load-button {
-  background-color: #4caf50;
+  background: linear-gradient(45deg, #2E7D32, #388E3C);
   color: white;
 }
 
 .surprise-button {
-  background-color: #ff9800;
+  background: linear-gradient(45deg, #F57C00, #FB8C00);
   color: white;
 }
 
 .load-button:hover:not(:disabled),
 .surprise-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.load-button:hover:not(:disabled) {
-  background-color: #45a049;
-}
-
-.surprise-button:hover {
-  background-color: #f57c00;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .load-button:disabled {
-  background-color: #cccccc;
+  background: #e2e8f0;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
-/* Map Styles */
 .map-container {
   width: 100%;
   height: 600px;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   z-index: 1;
 }
 
-/* Cluster Marker Styles */
+/* Custom marker cluster styles */
 .mycluster {
-  background: linear-gradient(45deg, #008b8b, #20b2aa);
+  background: linear-gradient(45deg, #1a5f7a, #2E7D32);
   border-radius: 50%;
   color: white;
-  width: 40px !important;
-  height: 40px !important;
-  font-size: 16px;
-  font-weight: bold;
-  border: 2px solid white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  width: 36px !important;
+  height: 36px !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(8px);
 }
 
-/* Vue Select Styles */
+/* Multiselect customization */
 .v-select {
-  flex: 1;
-  position: relative;
-  z-index: 1000;
-  font-size: 1rem;
-  font-family: 'Hubot Sans', system-ui, -apple-system, sans-serif;
+  --vs-controls-color: #64748b;
+  --vs-border-color: #e2e8f0;
+  --vs-dropdown-bg: #ffffff;
+  --vs-dropdown-color: #0f172a;
+  --vs-dropdown-option-color: #64748b;
+  --vs-selected-bg: #f1f5f9;
+  --vs-selected-color: #0f172a;
 }
 
 .v-select .vs__dropdown-toggle {
-  padding: 6px 0;
+  padding: 4px 0;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.v-select .vs__dropdown-toggle:hover {
+  border-color: #cbd5e1;
 }
 
 .v-select .vs__selected {
-  color: #2c3e50;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  color: #0f172a;
+  font-weight: 500;
 }
 
 .v-select .vs__search::placeholder {
@@ -462,19 +450,24 @@ export default {
 }
 
 .v-select .vs__dropdown-menu {
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  padding: 4px;
 }
 
-/* Remove duplicate multiselect styles */
+.v-select .vs__dropdown-option {
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.v-select .vs__dropdown-option--highlight {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
 .month-select {
   min-width: 150px;
   max-width: 200px;
 }
-
-.monthly-plot {
-  margin-bottom: 1rem;
-}
-
 </style>

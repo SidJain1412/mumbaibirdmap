@@ -58,25 +58,51 @@ export default {
           legend: {
             display: false
           },
-          title: {
-            display: false
+          tooltip: {
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            titleColor: '#0f172a',
+            bodyColor: '#0f172a',
+            bodyFont: {
+              family: 'Inter'
+            },
+            borderColor: '#e2e8f0',
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                return `${context.formattedValue} Observations`;
+              }
+            }
           }
         },
         scales: {
           y: {
             beginAtZero: true,
+            grid: {
+              color: '#f1f5f9'
+            },
             ticks: {
-              precision: 0,
+              callback: function(value) {
+                return value;
+              },
               font: {
-                size: 10
-              }
+                size: 10,
+                family: 'Inter'
+              },
+              color: '#64748b'
             }
           },
           x: {
+            grid: {
+              display: false
+            },
             ticks: {
               font: {
-                size: 10
-              }
+                size: 10,
+                family: 'Inter'
+              },
+              color: '#64748b'
             }
           }
         }
@@ -92,9 +118,9 @@ export default {
   width: 100%;
   max-width: 1000px;
   margin: 0.5rem auto;
-  padding: 0.5rem;
+  padding: 0.75rem;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 </style> 
