@@ -34,6 +34,7 @@
       class="monthly-plot"
     />
     <div ref="mapContainer" class="map-container" />
+    <InfoFooter />
   </div>
 </template>
 
@@ -45,11 +46,13 @@ import "leaflet.heat";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import MonthlyPlot from './components/MonthlyPlot.vue'
+import InfoFooter from './components/InfoFooter.vue'
 
 export default {
   name: "SpeciesMap",
   components: {
-    MonthlyPlot
+    MonthlyPlot,
+    InfoFooter
   },
   data() {
     return {
@@ -317,7 +320,7 @@ export default {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 2rem;
+  padding: 2rem 2rem 1rem;
   max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
