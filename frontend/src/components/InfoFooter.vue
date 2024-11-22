@@ -2,7 +2,7 @@
   <div class="info-footer">
     <div class="info-content">
       <h3>About this Map</h3>
-      <p>This mapuses bird observation data from <a href="https://ebird.org" target="_blank" rel="noopener">eBird</a>, 
+      <p>This map uses bird observation data from <a href="https://ebird.org" target="_blank" rel="noopener">eBird</a>, 
       covering the period from January 2019 to January 2024.</p>
       
       <h4>Methodology</h4>
