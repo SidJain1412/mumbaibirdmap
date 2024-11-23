@@ -1,0 +1,9 @@
+{
+  "name": "Mumbai Bird Map",
+  "short_name": "Bird Map",
+  "description": "Explore bird sightings across Mumbai with interactive maps and monthly trends",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+} 

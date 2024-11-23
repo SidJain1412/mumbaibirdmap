@@ -1,17 +1,40 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Basic Meta Tags -->
+    <title>Mumbai Bird Map</title>
+    <meta name="description" content="Explore bird sightings across Mumbai with interactive maps and monthly trends. Discover where and when to find different bird species in Mumbai.">
+    <meta name="keywords" content="Mumbai, birds, birdwatching, bird map, wildlife, nature, bird watching, bird species">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sidjain1412.github.io/mumbaibirdmap/">
+    <meta property="og:title" content="Mumbai Bird Map">
+    <meta property="og:description" content="Explore bird sightings across Mumbai with interactive maps and monthly trends. Discover where and when to find different bird species in Mumbai.">
+    <meta property="og:image" content="https://sidjain1412.github.io/mumbaibirdmap/preview.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://sidjain1412.github.io/mumbaibirdmap/">
+    <meta property="twitter:title" content="Mumbai Bird Map">
+    <meta property="twitter:description" content="Explore bird sightings across Mumbai with interactive maps and monthly trends. Discover where and when to find different bird species in Mumbai.">
+    <meta property="twitter:image" content="https://sidjain1412.github.io/mumbaibirdmap/preview.png">
+    
+    <!-- Theme Color for Mobile Browsers -->
+    <meta name="theme-color" content="#ffffff">
   </head>
   <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
     <div id="app"></div>
-    <!-- built files will be auto injected -->
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
