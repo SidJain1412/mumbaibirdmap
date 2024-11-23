@@ -10,7 +10,8 @@
       The intensity of the heatmap represents the number of observations in each area. 
       Monthly patterns are displayed in the bar chart above to show seasonal variations in sightings.</p>
       
-      <p class="attribution">Built by <a href="https://github.com/sidjain1412" target="_blank" rel="noopener">Siddharth Jain</a>. Data courtesy of eBird, a project of the Cornell Lab of Ornithology.</p>
+      <p class="attribution">Built by <a href="https://github.com/sidjain1412" target="_blank" rel="noopener">Siddharth Jain</a>. DM me on my <a href="https://www.instagram.com/__sidjain__/" target="_blank" rel="noopener">Instagram</a> if you have any feedback/ ideas!</p>
+      <p>Data courtesy of eBird, a project of the Cornell Lab of Ornithology.</p>
     </div>
   </div>
 </template>
@@ -20,12 +21,18 @@
   width: 100%;
   max-width: 1000px;
   margin: 1rem auto 0;
-  padding: 1.25rem;
+  padding: 1rem;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .info-footer {
+    padding: 1.25rem;
+  }
 }
 
 .info-content {

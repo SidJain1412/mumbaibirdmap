@@ -114,13 +114,20 @@ export default {
 
 <style scoped>
 .chart-container {
-  height: 100px;
+  padding: 0.5rem;
+  height: 150px;
   width: 100%;
   max-width: 1000px;
   margin: 0.5rem auto;
-  padding: 0.75rem;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+@media (min-width: 768px) {
+  .chart-container {
+    padding: 0.75rem;
+    height: 100px;
+  }
 }
 </style> 

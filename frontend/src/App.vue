@@ -3,7 +3,7 @@
     <header class="header">
       <h1>Mumbai Bird Map</h1>
       <p>Explore bird sightings across Mumbai</p>
-      <p style="font-size: 0.8rem;">Made with ❤️ by <a href="https://twitter.com/sidjain1412" target="_blank" rel="noopener">Siddharth Jain</a></p>
+      <p style="font-size: 0.8rem;">Made with ❤️ by <a href="https://www.instagram.com/__sidjain__/" target="_blank" rel="noopener">Siddharth Jain</a></p>
     </header>
     <div class="controls">
       <v-select
@@ -329,7 +329,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 2rem;
+  padding: 1rem;
   max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
@@ -344,7 +344,7 @@ body {
 .header h1 {
   color: #0f172a;
   margin: 0;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.03em;
   background: linear-gradient(45deg, #1a5f7a, #2E7D32);
@@ -362,11 +362,12 @@ body {
 
 .controls {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.75rem;
   width: 100%;
   max-width: 1000px;
   background: white;
-  padding: 1.25rem;
+  padding: 1rem;
   border-radius: 16px;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   position: relative;
@@ -410,7 +411,7 @@ body {
 
 .map-container {
   width: 100%;
-  height: 600px;
+  height: 400px;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -484,8 +485,8 @@ body {
 }
 
 .month-select {
-  min-width: 150px;
-  max-width: 200px;
+  min-width: unset;
+  width: 100%;
 }
 
 /* Add loading indicator styles */
@@ -512,5 +513,36 @@ body {
   content: "Loading...";
   font-weight: 500;
   color: #2E7D32;
+}
+
+/* Add media queries for larger screens */
+@media (min-width: 768px) {
+  .container {
+    padding: 2rem;
+  }
+
+  .header h1 {
+    font-size: 2.5rem;
+  }
+
+  .controls {
+    flex-direction: row;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .map-container {
+    height: 600px;
+  }
+
+  .month-select {
+    min-width: 150px;
+    max-width: 200px;
+  }
+}
+
+/* Adjust v-select width for mobile */
+.v-select {
+  width: 100%;
 }
 </style>
