@@ -207,11 +207,11 @@ export default {
         
         // Filter by month if selected
         let locationData = [];
-        if (this.selectedMonth) {
-          locationData = speciesData[this.selectedMonth] || [];
-        } else {
+        if (typeof this.selectedMonth === 'object') {
           // Combine all months' data when no month is selected
           locationData = Object.values(speciesData).flat();
+        } else {
+          locationData = speciesData[this.selectedMonth] || [];
         }
 
         // Calculate monthly data for the plot
@@ -235,7 +235,7 @@ export default {
       }
 
       // Fetch data for the species
-      const filename = species.toLowerCase().replace(" ", "-");
+      const filename = species.toLowerCase().replaceAll(" ", "-");
       const response = await fetch(`data/species/${filename}.json`);
       
       if (!response.ok) {
