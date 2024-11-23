@@ -97,8 +97,13 @@ export default {
   },
   async created() {
     await this.fetchSpeciesList();
+    if (this.speciesList.length > 0) {
+      this.selectedSpecies = this.speciesList[0];
+      this.selectedMonth = { value: null, label: 'All Months' };
+    }
   },
   async mounted() {
+    document.title = "Mumbai Bird Map";
     try {
       await this.initializeMap();
       if (this.selectedSpecies && !this.isDestroying) {
@@ -201,12 +206,20 @@ export default {
         const speciesData = await this.getSpeciesData(this.selectedSpecies);
         
         // Filter by month if selected
-        let locationData;
-        if (this.selectedMonth.value) {
-          locationData = speciesData[this.selectedMonth.value] || [];
+        let locationData = [];
+        if (this.selectedMonth) {
+          locationData = speciesData[this.selectedMonth] || [];
         } else {
+          // Combine all months' data when no month is selected
           locationData = Object.values(speciesData).flat();
         }
+
+        // Calculate monthly data for the plot
+        this.monthlyData = Array(12).fill(0).map((_, index) => {
+          const monthNum = index + 1;
+          const monthData = speciesData[monthNum] || [];
+          return monthData.reduce((sum, location) => sum + location.count, 0);
+        });
 
         await this.updateMap(locationData);
       } catch (error) {
