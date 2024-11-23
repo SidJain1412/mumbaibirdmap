@@ -115,7 +115,7 @@ export default {
 <style scoped>
 .chart-container {
   padding: 0.5rem;
-  height: 150px;
+  height: 110px;
   width: 100%;
   max-width: 1000px;
   margin: 0.5rem auto;
