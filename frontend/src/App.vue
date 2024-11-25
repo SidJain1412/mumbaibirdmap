@@ -98,7 +98,8 @@ export default {
   async created() {
     await this.fetchSpeciesList();
     if (this.speciesList.length > 0) {
-      this.selectedSpecies = this.speciesList[0];
+      const randomIndex = Math.floor(Math.random() * this.speciesList.length/4);
+      this.selectedSpecies = this.speciesList[randomIndex].value;
       this.selectedMonth = { value: null, label: 'All Months' };
     }
   },
