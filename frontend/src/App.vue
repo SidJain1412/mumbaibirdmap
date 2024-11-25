@@ -191,7 +191,10 @@ export default {
         const response = await fetch("data/species-list.json");
         if (!response.ok) throw new Error("Failed to fetch species list");
         const data = await response.json();
-        this.speciesList = data;
+        this.speciesList = data.map(species => ({
+          value: species.name,
+          label: `${species.name} (Rarity Rank: ${species.rank})`
+        }));
       } catch (error) {
         console.error("Error fetching species list:", error);
       }

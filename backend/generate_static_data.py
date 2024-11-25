@@ -6,12 +6,23 @@ import pandas as pd
 df = pd.read_csv("data.csv")
 GRID_SIZE = 0.0015
 
-# Create species list
-species_list = list(df["COMMON NAME"].unique())
+# Calculate total counts per species and rank them
+species_totals = df.groupby("COMMON NAME")["OBSERVATION COUNT"].sum().sort_values(ascending=False)
+species_list = []
+
+# Create ranked species list with counts
+for species, count in species_totals.items():
+    species_list.append({
+        "name": species,
+        "count": int(count),
+        "rank": len(species_list) + 1  # Rank starts at 1 and increases
+    })
+
 
 # Create observations data
 observations = {}
-for species in species_list:
+for species_info in species_list:
+    species = species_info["name"]
     tdf = df[df["COMMON NAME"] == species]
 
     # Create monthly data
@@ -44,7 +55,8 @@ with open("../frontend/public/data/species-list.json", "w") as f:
     json.dump(species_list, f)
 
 # Save individual species files
-for species in species_list:
+for species_info in species_list:
+    species = species_info["name"]
     species_filename = species.lower().replace(" ", "-")
     with open(f"../frontend/public/data/species/{species_filename}.json", "w") as f:
         json.dump(observations[species], f)
