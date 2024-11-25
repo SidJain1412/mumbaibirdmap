@@ -1,6 +1,6 @@
 # Mumbai Bird Map 🦜
 
-An interactive visualization of bird sightings across Mumbai (Suburban), using data from eBird. View the live map at [sidjain1412.github.io/birdMap](https://sidjain1412.github.io/mumbaibirdmap)
+An interactive visualization of bird sightings across Mumbai (Suburban), using data from eBird. View the live map at [sidjain1412.github.io/mumbaibirdmap](https://sidjain1412.github.io/mumbaibirdmap)
 
 ## Features
 
