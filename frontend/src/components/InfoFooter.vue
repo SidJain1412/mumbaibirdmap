@@ -12,6 +12,7 @@
       
       <p class="attribution">Built by <a href="https://github.com/sidjain1412" target="_blank" rel="noopener">Siddharth Jain</a>. DM me on my <a href="https://www.instagram.com/__sidjain__/" target="_blank" rel="noopener">Instagram</a> if you have any feedback/ ideas!</p>
       <p>Data courtesy of eBird, a project of the Cornell Lab of Ornithology.</p>
+      <p>Please use this information responsibly.</p>
     </div>
   </div>
 </template>

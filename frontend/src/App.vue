@@ -2,8 +2,8 @@
   <div class="container">
     <header class="header">
       <h1>Mumbai Bird Map</h1>
-      <p>Explore bird sightings across Mumbai</p>
-      <p style="font-size: 0.8rem;">Made with ❤️ by <a href="https://www.instagram.com/__sidjain__/" target="_blank" rel="noopener">Siddharth Jain</a></p>
+      <p>Explore bird sightings across Mumbai Suburban Area</p>
+      <p style="font-size: 0.8rem;">Made with ❤️ by <a href="https://www.instagram.com/__sidjain__/" target="_blank" rel="noopener">Siddharth Jain</a> with eBird Data</p>
     </header>
     <div class="controls">
       <v-select
