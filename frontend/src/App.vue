@@ -306,7 +306,7 @@ export default {
     surpriseMe() {
       if (this.speciesList.length > 0) {
         const randomIndex = Math.floor(Math.random() * this.speciesList.length);
-        this.selectedSpecies = this.speciesList[randomIndex];
+        this.selectedSpecies = this.speciesList[randomIndex].value;
       }
     },
   },
