@@ -121,15 +121,30 @@ export default {
     selectedSpecies(newValue) {
       if (newValue && !this.isDestroying) {
         this.loadLocationData();
+        this.gtag('event', 'select_species', {
+          event_category: 'Species',
+          event_label: newValue,
+        });
       }
     },
-    selectedMonth() {
-      if (this.selectedSpecies && !this.isDestroying) {
+    selectedMonth(newValue) {
+      if (this.selectedSpecies && newValue && newValue.value !== null && !this.isDestroying) {
         this.loadLocationData();
+        this.gtag('event', 'filter_month', {
+          event_category: 'Month',
+          event_label: newValue.label,
+        });
       }
     },
   },
   methods: {
+    gtag(event, params) {
+      if (window.gtag) {
+        window.gtag(event, params);
+      } else {
+        console.warn('gtag is not defined');
+      }
+    },
     cleanup() {
       this.isDestroying = true;
 
