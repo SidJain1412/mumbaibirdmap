@@ -17,6 +17,12 @@ This project uses bird observation data from [eBird](https://ebird.org), coverin
 - Time Period: January 2019 to January 2024
 
 
+## Feature Roadmap
+
+- Add images of the selected birds
+- Show GPS location/ Google Maps link on marker information
+
+
 ## Local Development
 
 ### Prerequisites
