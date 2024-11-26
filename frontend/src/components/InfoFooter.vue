@@ -11,8 +11,9 @@
       Monthly patterns are displayed in the bar chart above to show seasonal variations in sightings.</p>
       
       <p class="attribution">Built by <a href="https://github.com/sidjain1412" target="_blank" rel="noopener">Siddharth Jain</a>. DM me on my <a href="https://www.instagram.com/__sidjain__/" target="_blank" rel="noopener">Instagram</a> if you have any feedback/ ideas!</p>
-      <p>Data courtesy of eBird, a project of the Cornell Lab of Ornithology.</p>
-      <p>Please use this information responsibly.</p>
+      <p>Data courtesy of eBird, a project of the Cornell Lab of Ornithology. This website is strictly non-commercial and only for information.</p>
+      <p>Data citation: eBird Basic Dataset. Version: EBD_relSep-2024. Cornell Lab of Ornithology, Ithaca, New York. Sep 2024.</p>
+      <p><b>Please use this information responsibly. </b>Latest information will not be included to prevent unethical use of the data.</p>
     </div>
   </div>
 </template>
