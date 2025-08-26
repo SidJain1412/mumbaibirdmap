@@ -48,6 +48,7 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import MonthlyPlot from './components/MonthlyPlot.vue'
 import InfoFooter from './components/InfoFooter.vue'
+import posthog from 'posthog-js'
 
 export default {
   name: "SpeciesMap",
@@ -105,6 +106,13 @@ export default {
   },
   async mounted() {
     document.title = "Mumbai Bird Map";
+    
+    posthog.capture('app_loaded', {
+      category: 'Page View',
+      user_action: 'page_load',
+      species_count: this.speciesList.length
+    });
+    
     try {
       await this.initializeMap();
       if (this.selectedSpecies && !this.isDestroying) {
@@ -112,6 +120,12 @@ export default {
       }
     } catch (error) {
       console.error("Failed to initialize map:", error);
+      
+      posthog.capture('map_initialization_error', {
+        category: 'Error',
+        error_message: error.message,
+        user_action: 'initialize_map'
+      });
     }
   },
   beforeUnmount() {
@@ -121,30 +135,29 @@ export default {
     selectedSpecies(newValue) {
       if (newValue && !this.isDestroying) {
         this.loadLocationData();
-        this.gtag('event', 'select_species', {
-          event_category: 'Species',
-          event_label: newValue,
+        // Track species selection with PostHog
+        posthog.capture('species_selected', {
+          species_name: newValue,
+          category: 'Species Selection',
+          user_action: 'select_species'
         });
       }
     },
     selectedMonth(newValue) {
       if (this.selectedSpecies && newValue && newValue.value !== null && !this.isDestroying) {
         this.loadLocationData();
-        this.gtag('event', 'filter_month', {
-          event_category: 'Month',
-          event_label: newValue.label,
+        // Track month filter with PostHog
+        posthog.capture('month_filtered', {
+          month: newValue.label,
+          month_value: newValue.value,
+          species: this.selectedSpecies,
+          category: 'Month Filter',
+          user_action: 'filter_month'
         });
       }
     },
   },
   methods: {
-    gtag(event, params) {
-      if (window.gtag) {
-        window.gtag(event, params);
-      } else {
-        console.warn('gtag is not defined');
-      }
-    },
     cleanup() {
       this.isDestroying = true;
 
@@ -241,8 +254,27 @@ export default {
         });
 
         await this.updateMap(locationData);
+        
+        // Track successful data loading with PostHog
+        posthog.capture('location_data_loaded', {
+          species_name: this.selectedSpecies,
+          month_filter: this.selectedMonth?.label || 'All Months',
+          location_count: locationData.length,
+          total_observations: locationData.reduce((sum, loc) => sum + loc.count, 0),
+          category: 'Data Interaction',
+          user_action: 'load_map_data'
+        });
+        
       } catch (error) {
         console.error("Error loading location data:", error);
+        
+        // Track errors with PostHog
+        posthog.capture('location_data_error', {
+          species_name: this.selectedSpecies,
+          error_message: error.message,
+          category: 'Error',
+          user_action: 'load_map_data'
+        });
       } finally {
         this.isLoading = false;
       }
@@ -321,7 +353,16 @@ export default {
     surpriseMe() {
       if (this.speciesList.length > 0) {
         const randomIndex = Math.floor(Math.random() * this.speciesList.length);
-        this.selectedSpecies = this.speciesList[randomIndex].value;
+        const selectedSpecies = this.speciesList[randomIndex].value;
+        this.selectedSpecies = selectedSpecies;
+        
+        // Track random species selection with PostHog
+        posthog.capture('random_species_clicked', {
+          species_name: selectedSpecies,
+          category: 'User Engagement',
+          user_action: 'surprise_me',
+          species_count: this.speciesList.length
+        });
       }
     },
   },
